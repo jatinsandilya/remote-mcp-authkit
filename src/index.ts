@@ -23,6 +23,7 @@ export class MyMCP extends McpAgent<Env, unknown, Props> {
           const backendUrl = env.BACKEND_URL || "http://localhost:8000";
 
           // Get user ID from WorkOS user in props
+		  console.log("[this.props]", this.props)
           const userId = this.props.claims.sub;
 
           if (!userId) {
@@ -146,6 +147,7 @@ export class MyMCP extends McpAgent<Env, unknown, Props> {
 
           // https://developers.cloudflare.com/agents/model-context-protocol/authorization/#using-authentication-context-in-your-mcp-server
           // Get user ID from WorkOS user in props
+		  console.log("[this.props]", this.props)
           const userId = this.props.claims.sub;
 
           if (!userId) {
