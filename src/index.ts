@@ -78,8 +78,7 @@ export class MyMCP extends McpAgent<Env, unknown, Props> {
           const result = await response.json() as {
             message: string;
             topic?: string | null;
-            memories: Array<any>;
-            reasoning?: string;
+            memories: Array<string>;
             total_results?: number;
           };
 
@@ -89,9 +88,7 @@ export class MyMCP extends McpAgent<Env, unknown, Props> {
               content: [
                 {
                   type: "text",
-                  text: `${result.message}${
-                    result.reasoning ? `\nReason: ${result.reasoning}` : ""
-                  }`,
+                  text: `${result.message}`,
                 },
               ],
             };
@@ -100,7 +97,7 @@ export class MyMCP extends McpAgent<Env, unknown, Props> {
           // Format successful response
           const memoryText = result.memories.length > 0
             ? `\n\nFound memories:\n${result.memories
-                .map((m: any, i: number) => `${i + 1}. ${m}`)
+                .map((m: string, i: number) => `${i + 1}. ${m}`)
                 .join("\n")}`
             : "\n\nNo specific memories found for this query.";
 
