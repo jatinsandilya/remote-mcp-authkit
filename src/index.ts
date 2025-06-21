@@ -12,16 +12,6 @@ export class MyMCP extends McpAgent<Env, unknown, Props> {
   });
 
   async init() {
-    // Hello, world!
-    this.server.tool(
-      "add",
-      "Add two numbers the way only MCP can",
-      { a: z.number(), b: z.number() },
-      async ({ a, b }) => ({
-        content: [{ type: "text", text: String(a + b) }],
-      })
-    );
-
     this.server.tool(
       "get-memory",
       "Get the user's memory given a query by the user",
