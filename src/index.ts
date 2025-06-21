@@ -17,10 +17,113 @@ export class MyMCP extends McpAgent<Env, unknown, Props> {
       "Get the user's memory given a query by the user",
       { query: z.string() },
       async ({ query }) => {
-        // TODO(@jatin): Implement this
-        return {
-          content: [{ type: "text", text: `User memory for query: ${query}` }],
-        };
+        try {
+          // Get the backend URL from environment
+          const env = this.env as Env;
+          const backendUrl = env.BACKEND_URL || "http://localhost:8000";
+
+          // Get user ID from WorkOS user in props
+          const userId = this.props.claims.sub;
+
+          if (!userId) {
+            return {
+              content: [{ type: "text", text: "Error: User ID not available" }],
+            };
+          }
+
+          // Make API call to backend
+          const response = await fetch(
+            `${backendUrl}/users/${userId}/memories?query=${encodeURIComponent(query)}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            const error = (await response
+              .json()
+              .catch(() => ({ detail: response.statusText }))) as {
+              detail: string;
+            };
+
+            // Handle specific error cases
+            if (response.status === 404) {
+              return {
+                content: [{ type: "text", text: "Error: User not found" }],
+              };
+            } else if (response.status === 400) {
+              return {
+                content: [{ type: "text", text: `Error: ${error.detail}` }],
+              };
+            } else if (response.status === 503) {
+              return {
+                content: [
+                  {
+                    type: "text",
+                    text: `Service unavailable: ${error.detail}`,
+                  },
+                ],
+              };
+            }
+
+            throw new Error(
+              `Backend API error: ${error.detail || response.statusText}`
+            );
+          }
+
+          const result = await response.json() as {
+            message: string;
+            topic?: string | null;
+            memories: Array<any>;
+            reasoning?: string;
+            total_results?: number;
+          };
+
+          // Handle case where query doesn't match any topics
+          if (!result.topic) {
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: `${result.message}${
+                    result.reasoning ? `\nReason: ${result.reasoning}` : ""
+                  }`,
+                },
+              ],
+            };
+          }
+
+          // Format successful response
+          const memoryText = result.memories.length > 0
+            ? `\n\nFound memories:\n${result.memories
+                .map((m: any, i: number) => `${i + 1}. ${m}`)
+                .join("\n")}`
+            : "\n\nNo specific memories found for this query.";
+
+          return {
+            content: [
+              {
+                type: "text",
+                text: `${result.message}${memoryText}`,
+              },
+            ],
+          };
+        } catch (error) {
+          console.error("Error retrieving memories:", error);
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Error retrieving memories: ${
+                  error instanceof Error ? error.message : "Unknown error"
+                }`,
+              },
+            ],
+          };
+        }
       }
     );
 
