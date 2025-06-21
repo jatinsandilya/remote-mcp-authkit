@@ -22,6 +22,34 @@ export class MyMCP extends McpAgent<Env, unknown, Props> {
 			})
 		);
 
+
+
+		this.server.tool(
+			"get-memory",
+			"Get the user's memory given a query by the user",
+			{ query: z.string() },
+			async ({ query }) => {
+				// TODO(@jatin): Implement this
+				return {
+					content: [{ type: "text", text: `User memory for query: ${query}` }],
+				}
+			}
+		);
+
+
+		this.server.tool(
+			"store-memory",
+			"Store the user's memory given a query & context",
+			{ query: z.string(), context: z.string() },
+			async ({ query, context }) => {
+				// TODO(@jatin): Implement this
+				return {
+					content: [{ type: "text", text: `User memory saved for query: ${query}` }],
+				}
+			}
+		);
+
+		
 		// Dynamically add tools based on the user's permissions. They must have the
 		// `image_generation` permission to use this tool.
 		if (this.props.permissions.includes("image_generation")) {
