@@ -6,4 +6,5 @@ interface Env {
 	WORKOS_CLIENT_SECRET: string;
 	MCP_OBJECT: DurableObjectNamespace /* MyMCP */;
 	AI: Ai;
+	BACKEND_URL?: string;
 }

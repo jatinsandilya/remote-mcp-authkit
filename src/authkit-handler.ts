@@ -80,6 +80,13 @@ app.get("/callback", async (c) => {
 			permissions,
 			refreshToken,
 			user,
+			claims: {
+				sub: user.id,
+				email: user.email,
+				given_name: user.firstName || "",
+				family_name: user.lastName || "",
+				picture: user.profilePictureUrl || "",
+			},
 		} satisfies Props,
 	});
 
